@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  postgres:
+    container_name: bayzdelivery_db
+    image: postgres
+    restart: unless-stopped
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-db_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123qwe}
+      POSTGRES_DB: ${POSTGRES_DB:-bayzdelivery}
+      PGDATA: /data/postgres/bayztracker
+    networks:
+      - postgres
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
