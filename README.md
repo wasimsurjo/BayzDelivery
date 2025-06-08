@@ -46,4 +46,4 @@ Please make your changes to this repository in your local, commit the changes wi
 - Make sure code is working properly.
 - Prepare necessary instructions to run your application in `DOC.md` file.
 - Make sure all changes are committed within the git history, the history will be part of consideration.
-- If you have questions, please send email us, we'll get back to you as soon as possible.
+- If you have questions, please send an email to us, we'll get back to you as soon as possible.

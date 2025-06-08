@@ -22,6 +22,8 @@ Reason: Added logging dependencies to enable proper logging.
 Changes:
 - Added Logger
 - Added logging statements for app startup
+- Added @EnableAsync for asynchronous processing
+- Improved startup logging
 
 4. DeliveryController.java
 -------------------------
@@ -118,6 +120,16 @@ Changes:
 - Added findTopDeliveryMenByCommission query for performance metrics
 - Added proper parameter annotations
 - Added @Repository annotation
+- Added findDelayedDeliveries query for monitoring delayed deliveries
+
+14. DelayedDeliveryNotifier.java
+-------------------------------
+Changes:
+- Implemented scheduled task for checking delayed deliveries
+- Added async notification system
+- Added detailed logging with timestamps
+- Added proper error handling
+- Added formatted delivery information in notifications
 
 Summary of Major Improvements:
 ----------------------------
@@ -134,10 +146,17 @@ Summary of Major Improvements:
 11. Added performance metrics for delivery men
 12. Improved database constraints and validations
 13. Added user-friendly error messages
+14. Added automated delayed delivery monitoring
+15. Implemented async notification system
 
 Avoided Changes (But Had in Mind):
 -----------------------------
 1. Renaming PERSON to USER 
 2. Using a static variable to track delivery status instead of time based calculation
 3. Different Types of Exception Handling
+4. Implementing a delivery status webhook system for real-time updates
+5. Adding a simple caching layer for frequently accessed delivery data
+6. Creating a delivery time estimation system based on historical data
+7. Adding support for delivery zones and preferred delivery men
+8. Implementing a simple rating system for delivery men
 
