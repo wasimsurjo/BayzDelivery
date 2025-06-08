@@ -30,6 +30,9 @@ Changes:
 - Improved readability by updating names and mappings
 - Added detailed logging messages
 - Improved response handling
+- Split delivery creation into two endpoints: /delivery/order and /delivery/complete
+- Added new endpoint for getting top delivery men
+- Added proper date/time formatting for API parameters
 
 5. PersonController.java
 -----------------------
@@ -46,13 +49,20 @@ Changes:
 - Added specific handler for ResponseStatusException
 - Improved error messages and logging
 - Changed default error status from BAD_REQUEST to INTERNAL_SERVER_ERROR
+- Added specific handler for DataIntegrityViolationException
+- Added user-friendly error messages for database constraint violations
+- Improved HTTP status codes for different types of errors
 
 7. Delivery.java
 ---------------
 Changes:
 - Fixed typo in field name: comission → commission
 - Updated getter/setter methods for commission
-
+- Added orderId field with proper validation
+- Updated toString() method to include orderId
+- Updated equals() and hashCode() methods to include orderId
+- Made price and customer fields @NotNull
+- Removed @NotNull from endTime field
 
 8. Person.java
 -------------
@@ -71,6 +81,11 @@ Changes:
 - Added role-based validation
 - Added time validation
 - Added price and distance validation
+- Split save() method into createOrder() and completeDelivery()
+- Improved concurrent delivery check using database query
+- Added method to get top delivery men by commission
+- Added proper validation for customer and delivery man roles
+- Improved commission calculation with proper rounding
 
 10. PersonServiceImpl.java
 -------------------------
@@ -88,9 +103,21 @@ Reason: Improved development experience with hot reloading capabilities.
 
 12. db.changelog-master.xml
 --------------------------
-Added new changelog files
+Added new changelog files:
+- Added changelog-0000004.xml for order_id field
+- Added changelog-0000005.xml for role-based changes
+- Added changelog-0000006.xml for unique constraints
+- Updated schema version from 3.4 to 4.1
 
-Reason: Added new database schema changes.
+13. DeliveryRepository.java
+--------------------------
+Changes:
+- Changed from CrudRepository to JpaRepository
+- Added findByOrderId query method
+- Added hasConcurrentDelivery query for checking overlapping deliveries
+- Added findTopDeliveryMenByCommission query for performance metrics
+- Added proper parameter annotations
+- Added @Repository annotation
 
 Summary of Major Improvements:
 ----------------------------
@@ -102,7 +129,11 @@ Summary of Major Improvements:
 6. Improved development experience
 7. Enhanced code organization and clarity
 8. Added database schema changes
-
+9. Split delivery creation into two-phase process
+10. Added proper concurrent delivery validation
+11. Added performance metrics for delivery men
+12. Improved database constraints and validations
+13. Added user-friendly error messages
 
 Avoided Changes (But Had in Mind):
 -----------------------------

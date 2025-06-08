@@ -24,16 +24,19 @@ public class Delivery implements Serializable{
   Long id;
 
   @NotNull
+  @Column(name = "order_id")
+  String orderId;
+
   @Column(name = "start_time")
   Instant startTime;
 
-  @NotNull
   @Column(name = "end_time")
   Instant endTime;
 
   @Column(name = "distance")
   Long distance;
 
+  @NotNull
   @Column(name = "price")
   Long price;
 
@@ -44,6 +47,7 @@ public class Delivery implements Serializable{
   @JoinColumn(name = "delivery_man_id", referencedColumnName = "id")
   Person deliveryMan;
 
+  @NotNull
   @ManyToOne
   @JoinColumn(name = "customer_id", referencedColumnName = "id")
   Person customer;
@@ -54,6 +58,14 @@ public class Delivery implements Serializable{
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getOrderId() {
+    return orderId;
+  }
+
+  public void setOrderId(String orderId) {
+    this.orderId = orderId;
   }
 
   public Instant getStartTime() {
@@ -112,8 +124,6 @@ public class Delivery implements Serializable{
     this.customer = customer;
   }
 
-
-
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -124,6 +134,7 @@ public class Delivery implements Serializable{
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + ((customer == null) ? 0 : customer.hashCode());
     result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
+    result = prime * result + ((orderId == null) ? 0 : orderId.hashCode());
     return result;
   }
 
@@ -166,14 +177,16 @@ public class Delivery implements Serializable{
         return false;
     } else if (!startTime.equals(other.startTime))
       return false;
+    if (orderId == null) {
+      if (other.orderId != null)
+        return false;
+    } else if (!orderId.equals(other.orderId))
+      return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "Delivery [id=" + id + ", startTime=" + startTime + ", endTime=" + endTime + ", distance=" + distance + ", deliveryMan=" + deliveryMan + ", customer=" + customer + "]";
+    return "Delivery [id=" + id + ", orderId=" + orderId + ", startTime=" + startTime + ", endTime=" + endTime + ", distance=" + distance + ", deliveryMan=" + deliveryMan + ", customer=" + customer + "]";
   }
-
-
-
 }

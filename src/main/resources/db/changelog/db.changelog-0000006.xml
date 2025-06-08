@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="20240308_add_unique_constraints" author="wasim">
+        <addUniqueConstraint tableName="delivery" columnNames="order_id" constraintName="uk_delivery_order_id"/>
+        
+        <addUniqueConstraint tableName="person" columnNames="email" constraintName="uk_person_email"/>
+        <addUniqueConstraint tableName="person" columnNames="registration_number" constraintName="uk_person_registration_number"/>
+        <addUniqueConstraint tableName="delivery" 
+                            columnNames="delivery_man_id,start_time,end_time" 
+                            constraintName="uk_delivery_concurrent"/>
+    </changeSet>
+
+</databaseChangeLog> 
