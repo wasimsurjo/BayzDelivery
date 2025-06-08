@@ -17,6 +17,12 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
     @Query("SELECT d FROM Delivery d WHERE d.orderId = :orderId")
     Optional<Delivery> findByOrderId(@Param("orderId") String orderId);
 
+    @Query("SELECT d FROM Delivery d " +
+           "WHERE d.startTime IS NOT NULL " +
+           "AND d.endTime IS NULL " +
+           "AND d.startTime <= :thresholdTime")
+    List<Delivery> findDelayedDeliveries(@Param("thresholdTime") Instant thresholdTime);
+
     @Query("SELECT CASE WHEN COUNT(d) > 0 THEN true ELSE false END FROM Delivery d " +
            "WHERE d.deliveryMan.id = :deliveryManId " +
            "AND d.orderId != :orderId " +
