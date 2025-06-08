@@ -8,18 +8,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
 @ControllerAdvice
 @Component
 public class GlobalExceptionHandler {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+  @ExceptionHandler(ResponseStatusException.class)
+  public ResponseEntity<AbstractMap.SimpleEntry<String, String>> handleResponseStatusException(ResponseStatusException exception) {
+    log.warn("Request validation failed: {}", exception.getMessage());
+    AbstractMap.SimpleEntry<String, String> response =
+        new AbstractMap.SimpleEntry<>("message", exception.getReason());
+    return ResponseEntity.status(exception.getStatusCode()).body(response);
+  }
 
   @ExceptionHandler
   public ResponseEntity<AbstractMap.SimpleEntry<String, String>> handle(Exception exception) {
-    LOG.error("Request could not be processed: ", exception);
+    log.error("Unexpected error occurred: ", exception);
     AbstractMap.SimpleEntry<String, String> response =
         new AbstractMap.SimpleEntry<>("message", "Request could not be processed");
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
   }
 }

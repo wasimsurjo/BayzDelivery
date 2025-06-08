@@ -6,5 +6,4 @@ import org.springframework.data.rest.core.annotation.RestResource;
 
 @RestResource(exported = false)
 public interface DeliveryRepository extends CrudRepository<Delivery, Long> {
-
 }

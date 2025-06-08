@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 
 @Entity
 @Table(name = "person")
@@ -32,6 +34,11 @@ public class Person implements Serializable{
 
   @Column(name = "registration_number")
   String registrationNumber;
+
+  @NotNull
+  @Column(name = "role")
+  @Enumerated(EnumType.STRING)
+  PersonRole role;
 
   public Long getId() {
     return id;
@@ -63,6 +70,14 @@ public class Person implements Serializable{
 
   public void setRegistrationNumber(String registrationNumber) {
     this.registrationNumber = registrationNumber;
+  }
+
+  public PersonRole getRole() {
+    return role;
+  }
+
+  public void setRole(PersonRole role) {
+    this.role = role;
   }
 
   @Override

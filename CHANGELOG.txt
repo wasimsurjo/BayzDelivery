@@ -1,0 +1,112 @@
+Author: Wasim Surjo
+BayzDelivery Application Changelog
+================================
+
+This changelog documents the changes I made to the BayzDelivery application........
+
+1. .gitignore
+-------------
+Added: .vscode/*
+Reason: To ignore VS Code specific files and settings.
+
+2. build.gradle
+--------------
+Added Dependencies:
+- org.:-api
+- ch.qos.logback:logback-classic
+
+Reason: Added logging dependencies to enable proper logging.
+
+3. BayzDeliveryApplication.java
+------------------------------
+Changes:
+- Added Logger
+- Added logging statements for app startup
+
+4. DeliveryController.java
+-------------------------
+Changes:
+- Improved error handling with try-catch blocks
+- Improved readability by updating names and mappings
+- Added detailed logging messages
+- Improved response handling
+
+5. PersonController.java
+-----------------------
+Changes:
+- Improved error handling with try-catch blocks
+- Improved readability by updating names and mappings
+- Added detailed logging messages
+- Improved response handling
+
+6. GlobalExceptionHandler.java
+-----------------------------
+Changes:
+- Renamed LOG to log for better readability
+- Added specific handler for ResponseStatusException
+- Improved error messages and logging
+- Changed default error status from BAD_REQUEST to INTERNAL_SERVER_ERROR
+
+7. Delivery.java
+---------------
+Changes:
+- Fixed typo in field name: comission → commission
+- Updated getter/setter methods for commission
+
+
+8. Person.java
+-------------
+Changes:
+- Added new field 'role' of type PersonRole (enum)
+- Added @NotNull validation
+- Added @Enumerated(EnumType.STRING) annotation
+- Added getter/setter methods for role
+
+9. DeliveryServiceImpl.java
+--------------------------
+Changes:
+- Added validation logic for deliveries
+- Added commission calculation logic
+- Added checks for concurrent deliveries
+- Added role-based validation
+- Added time validation
+- Added price and distance validation
+
+10. PersonServiceImpl.java
+-------------------------
+Changes:
+- Improved error handling
+- Simplified the getAll() method
+- Added better null handling
+
+11. application.yml
+------------------
+Added Spring DevTools Configuration:
+- Enabled auto-restart
+
+Reason: Improved development experience with hot reloading capabilities.
+
+12. db.changelog-master.xml
+--------------------------
+Added new changelog files
+
+Reason: Added new database schema changes.
+
+Summary of Major Improvements:
+----------------------------
+1. Added comprehensive logging throughout the application
+2. Improved error handling and validation
+3. Added role-based functionality
+4. Fixed typos and inconsistencies
+5. Added essential logic for deliveries
+6. Improved development experience
+7. Enhanced code organization and clarity
+8. Added database schema changes
+
+
+Avoided Changes (But Had in Mind):
+-----------------------------
+1. Renaming PERSON to USER 
+2. Using a static variable to track delivery status instead of time based calculation
+3. Different Types of Exception Handling
+
