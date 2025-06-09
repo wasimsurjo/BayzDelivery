@@ -1,6 +1,8 @@
 # API Documentation 
 # I'll focus on core ENDPOINTS & FEATURES
 
+Github: https://github.com/wasimsurjo/BayzDelivery
+
 ## Prerequisites
 - Java 17
 - Docker and Docker Compose
@@ -27,17 +29,23 @@
    The application will start on port 8081 :`http://localhost:8081/api`. (Locally)
 
 # Docker Deployment 
-    ```bash
-    docker build -t bayzdelivery:latest .
-    ```
-    
-    ```bash
-    docker run --name bayzdelivery-app --network bayzdelivery_postgres -p 8081:8081 \
-    -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bayzdelivery \
-    -e SPRING_DATASOURCE_USERNAME=db_user \
-    -e SPRING_DATASOURCE_PASSWORD=123qwe \
-    bayzdelivery:latest
-    ```
+
+   Note: I've enabled unit tests while building via DOCKER. If you want a faster build please use the command below inside Dockerfile:
+   ```bash
+   RUN ./gradlew bootJar -DskipTests
+   ```
+   
+   ```bash
+   docker build -t bayzdelivery:latest .
+   ```
+   
+   ```bash
+   docker run --name bayzdelivery-app --network bayzdelivery_postgres -p 8081:8081 \
+   -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bayzdelivery \
+   -e SPRING_DATASOURCE_USERNAME=db_user \
+   -e SPRING_DATASOURCE_PASSWORD=123qwe \
+   bayzdelivery:latest
+   ```
 
 ## API Endpoint Testing
 
@@ -236,7 +244,7 @@ Sample Response:
 
 ## Features
 
-### 1. Two-Phase Delivery Process
+### 1. Two-Phase Delivery Process (Bonus)
 - First create an order using `/delivery/order`
 - Then complete the delivery using `/delivery/complete`
 - System validates concurrent deliveries
@@ -260,7 +268,7 @@ Sample Response:
 - Unique registration numbers for delivery men
 - No concurrent deliveries for the same delivery man
 
-## Error Handling
+## Error Handling (Bonus)
 The application provides clear error messages for:
 - Duplicate order IDs
 - Concurrent delivery attempts

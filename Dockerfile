@@ -2,7 +2,7 @@ FROM gradle:7.3.3-jdk17 AS gradlebuilder-clean
 RUN mkdir /project
 COPY . /project
 WORKDIR /project
-RUN ./gradlew bootJar -DskipTests
+RUN ./gradlew bootJar
 
 
 FROM azul/zulu-openjdk-alpine:17-jre
