@@ -35,7 +35,8 @@ public class DeliveryServiceImpl implements DeliveryService {
         log.info("Creating new order for customer: {}", delivery.getCustomer().getId());
         try {
             validateCustomer(delivery.getCustomer().getId());
-            delivery.setStartTime(null);
+            validateDeliveryMan(delivery.getDeliveryMan().getId());
+            validateStartTime(delivery.getStartTime());
             delivery.setEndTime(null);
             delivery.setDistance(null);
             delivery.setCommission(null);
@@ -60,7 +61,15 @@ public class DeliveryServiceImpl implements DeliveryService {
 
             Delivery orderToUpdate = existingOrder.get();
             
-            orderToUpdate.setDeliveryMan(delivery.getDeliveryMan());
+            if (!orderToUpdate.getDeliveryMan().getId().equals(delivery.getDeliveryMan().getId())) {
+                log.error("Delivery man mismatch for order: {}. Expected: {}, Got: {}", 
+                    delivery.getOrderId(), 
+                    orderToUpdate.getDeliveryMan().getId(), 
+                    delivery.getDeliveryMan().getId());
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                    "Only the assigned delivery man can complete this order!");
+            }
+            
             orderToUpdate.setStartTime(delivery.getStartTime());
             orderToUpdate.setEndTime(delivery.getEndTime());
             orderToUpdate.setDistance(delivery.getDistance());
@@ -187,18 +196,57 @@ public class DeliveryServiceImpl implements DeliveryService {
         log.info("Fetching top delivery men from {} to {}", startTime, endTime);
         try {
             List<Object[]> results = deliveryRepository.findTopDeliveryMenByCommission(startTime, endTime);
-            return results.stream()
+            List<TopDeliveryManDTO> topDeliveryMen = results.stream()
                 .limit(3)
                 .map(result -> new TopDeliveryManDTO(
                     (Long) result[0],
                     (String) result[1],
                     new BigDecimal(result[2].toString()),
-                    (Long) result[3]
-                ))
+                    (Long) result[3],
+                    null  ))
                 .toList();
+
+            if (!topDeliveryMen.isEmpty()) {
+                BigDecimal totalCommission = topDeliveryMen.stream()
+                    .map(TopDeliveryManDTO::getTotalCommission)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal averageCommission = totalCommission.divide(
+                    BigDecimal.valueOf(topDeliveryMen.size()), 
+                    2, 
+                    RoundingMode.HALF_UP
+                );
+
+                topDeliveryMen.forEach(dto -> dto.setAverageCommission(averageCommission));
+            }
+
+            return topDeliveryMen;
         } catch (Exception e) {
             log.error("Failed to fetch top delivery men: {}", e.getMessage(), e);
             throw e;
+        }
+    }
+
+    private void validateStartTime(Instant startTime) {
+        if (startTime == null) {
+            log.error("Start time is required for order creation");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start time is required!");
+        }
+        if (startTime.isBefore(Instant.now())) {
+            log.error("Start time cannot be in the past: {}", startTime);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start time cannot be in the past!");
+        }
+    }
+
+    private void validateDeliveryMan(Long deliveryManId) {
+        Optional<Person> optionalDeliveryMan = personRepository.findById(deliveryManId);
+        if (!optionalDeliveryMan.isPresent()) {
+            log.error("Invalid delivery man ID: {}", deliveryManId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Delivery man ID invalid or does not exist!");
+        }
+        Person deliveryMan = optionalDeliveryMan.get();
+        if (deliveryMan.getRole() != PersonRole.DELIVERY_MAN) {
+            log.error("Person {} is not a delivery man", deliveryMan.getId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested Person is not a delivery man!");
         }
     }
 }

@@ -6,6 +6,7 @@ plugins {
 
 group = 'com.bayzdelivery'
 version = '0.0.1-SNAPSHOT'
+archivesBaseName = 'bayzdelivery'
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -31,7 +32,6 @@ dependencies {
     testImplementation 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-aop'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.mockito:mockito-core:2.28.2'
 }
 
 tasks.withType(Test) {
