@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   postgres:
     container_name: bayzdelivery_db
@@ -13,7 +11,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-db_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123qwe}
       POSTGRES_DB: ${POSTGRES_DB:-bayzdelivery}
-      PGDATA: /data/postgres/bayztracker
+      PGDATA: /data/postgres/bayzdelivery
     networks:
       - postgres
 

@@ -1,6 +1,8 @@
 # API Documentation 
 # I'll focus on core ENDPOINTS & FEATURES
 
+Github: https://github.com/wasimsurjo/BayzDelivery
+
 ## Prerequisites
 - Java 17
 - Docker and Docker Compose
@@ -10,11 +12,13 @@
 
 1. **Starting the Database**
    ```bash
-   docker compose up
+   docker compose up -d
    ```
    This will start PostgreSQL on port 5432.
 
 2. **Running the Application**
+
+# Local Run
    ```bash
    # For Linux/Mac
    ./gradlew bootRun
@@ -22,7 +26,26 @@
    # For Windows
    gradlew.bat bootRun
    ```
-   The application will start on port 8081 with context path `/api`.
+   The application will start on port 8081 :`http://localhost:8081/api`. (Locally)
+
+# Docker Deployment 
+
+   Note: I've enabled unit tests while building via DOCKER. If you want a faster build please use the command below inside Dockerfile:
+   ```bash
+   RUN ./gradlew bootJar -DskipTests
+   ```
+   
+   ```bash
+   docker build -t bayzdelivery:latest .
+   ```
+   
+   ```bash
+   docker run --name bayzdelivery-app --network bayzdelivery_postgres -p 8081:8081 \
+   -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bayzdelivery \
+   -e SPRING_DATASOURCE_USERNAME=db_user \
+   -e SPRING_DATASOURCE_PASSWORD=123qwe \
+   bayzdelivery:latest
+   ```
 
 ## API Endpoint Testing
 
@@ -84,7 +107,11 @@ Content-Type: application/json
     "price": 100,
     "customer": {
         "id": 1
-    }
+    },
+    "deliveryMan": {
+        "id": 2
+    },
+    "startTime": "2025-06-08T16:30:00Z"
 }
 ```
 Sample Response:
@@ -93,11 +120,19 @@ Sample Response:
     "id": 1,
     "orderId": "ORD-123",
     "price": 100,
+    "startTime": "2025-06-08T16:30:00Z",
     "customer": {
         "id": 1,
         "name": "Abdullah Customer",
         "email": "abdullah@example.com",
         "role": "CUSTOMER"
+    },
+    "deliveryMan": {
+        "id": 2,
+        "name": "Zahed Driver",
+        "email": "zahed@example.com",
+        "registrationNumber": "DRV-001",
+        "role": "DELIVERY_MAN"
     }
 }
 ```
@@ -112,22 +147,24 @@ Content-Type: application/json
     "deliveryMan": {
         "id": 2
     },
-    "startTime": "2024-03-08T16:30:00Z",
-    "endTime": "2024-03-08T17:00:00Z",
+    "startTime": "2025-06-08T16:30:00Z",
+    "endTime": "2025-06-08T17:00:00Z",
     "distance": 10,
     "price": 100
 }
 ```
+Note: The delivery man completing the order must be the same one who was assigned during order creation. Attempting to complete an order with a different delivery man will result in an error.
+
 Sample Response:
 ```json
 {
     "id": 1,
     "orderId": "ORD-123",
-    "startTime": "2024-03-08T16:30:00Z",
-    "endTime": "2024-03-08T17:00:00Z",
+    "startTime": "2025-06-08T16:30:00Z",
+    "endTime": "2025-06-08T17:00:00Z",
     "distance": 10,
     "price": 100,
-    "commission": 55,
+    "commission": 10,
     "deliveryMan": {
         "id": 2,
         "name": "Zahed Driver",
@@ -157,7 +194,7 @@ Sample Response:
     "endTime": "2025-06-08T17:00:00Z",
     "distance": 10,
     "price": 100,
-    "commission": 55,
+    "commission": 10,
     "deliveryMan": {
         "id": 2,
         "name": "Zahed Driver",
@@ -180,31 +217,34 @@ GET /api/delivery/top?startTime=2025-06-01T00:00:00Z&endTime=2025-07-01T23:59:59
 ```
 Sample Response:
 ```json
-[
-    {
-        "deliveryManId": 2,
-        "deliveryManName": "Zahed Driver",
-        "totalCommission": 255.00,
-        "totalDeliveries": 10
-    },
-    {
-        "deliveryManId": 4,
-        "deliveryManName": "Redha Driver",
-        "totalCommission": 135.00,
-        "totalDeliveries": 8
-    },
-    {
-        "deliveryManId": 6,
-        "deliveryManName": "Kareem Driver",
-        "totalCommission": 50.00,
-        "totalDeliveries": 5
-    }
-]
+{
+    "topDeliveryMen": [
+        {
+            "deliveryManId": 2,
+            "deliveryManName": "Zahed Driver",
+            "totalCommission": 255.00,
+            "totalDeliveries": 10
+        },
+        {
+            "deliveryManId": 4,
+            "deliveryManName": "Redha Driver",
+            "totalCommission": 135.00,
+            "totalDeliveries": 8
+        },
+        {
+            "deliveryManId": 6,
+            "deliveryManName": "Kareem Driver",
+            "totalCommission": 50.00,
+            "totalDeliveries": 5
+        }
+    ],
+    "averageCommission": 146.67
+}
 ```
 
 ## Features
 
-### 1. Two-Phase Delivery Process
+### 1. Two-Phase Delivery Process (Bonus)
 - First create an order using `/delivery/order`
 - Then complete the delivery using `/delivery/complete`
 - System validates concurrent deliveries
@@ -228,10 +268,11 @@ Sample Response:
 - Unique registration numbers for delivery men
 - No concurrent deliveries for the same delivery man
 
-## Error Handling
+## Error Handling (Bonus)
 The application provides clear error messages for:
 - Duplicate order IDs
 - Concurrent delivery attempts
 - Invalid time ranges
 - Role validation errors
 - Database constraint violations
+- Delivery man mismatch during order completion

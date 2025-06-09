@@ -20,60 +20,67 @@ import com.bayzdelivery.repositories.DeliveryRepository;
 @Component
 public class DelayedDeliveryNotifier {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DelayedDeliveryNotifier.class);
+    private static final Logger log = LoggerFactory.getLogger(DelayedDeliveryNotifier.class);
     private static final int DELIVERY_TIME_THRESHOLD_MINUTES = 45;
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
     private DeliveryRepository deliveryRepository;
-
+    
 
     @Scheduled(fixedDelay = 30000)
     public void checkDelayedDeliveries() {
         try {            
             Instant thresholdTime = Instant.now().minus(DELIVERY_TIME_THRESHOLD_MINUTES, ChronoUnit.MINUTES);
             String thresholdTimeStr = LocalDateTime.ofInstant(thresholdTime, ZoneId.systemDefault()).format(formatter);
-            LOG.info("Checking for deliveries started before: {}", thresholdTimeStr);
+            log.info("Checking for deliveries started before: {}", thresholdTimeStr);
             
             List<Delivery> delayedDeliveries = deliveryRepository.findDelayedDeliveries(thresholdTime);
             
             if (!delayedDeliveries.isEmpty()) {
-                LOG.warn("Found {} delayed deliveries:", delayedDeliveries.size());
+                log.warn("Found {} delayed deliveries:", delayedDeliveries.size());
                     
                 for (Delivery delivery : delayedDeliveries) {
                     notifyCustomerSupport(delivery);
                 }
             } else {
-                LOG.info("All Good! No delayed deliveries found!");
+                log.info("All Good! No delayed deliveries found!");
             }
         } catch (Exception e) {
-            LOG.error("Error checking delayed deliveries: {}", e.getMessage(), e);
+            log.error("Error checking delayed deliveries: {}", e.getMessage(), e);
         }
     }
 
     @Async
     public void notifyCustomerSupport(Delivery delivery) {
         try {
+            long minutesExceeded = ChronoUnit.MINUTES.between(
+                delivery.getStartTime(), 
+                Instant.now()
+            );
+
             String message = String.format(
                 "\n=== DELAYED DELIVERY ALERT ===\n" +
                 "Delivery ID: %s\n" +
                 "Order ID: %s\n" +
                 "Time Exceeded: %d minutes\n" +
-                "Delivery Man: %s\n" +
-                "Customer: %s\n" +
+                "Delivery Man: %s (ID: %d)\n" +
+                "Customer: %s (ID: %d)\n" +
                 "Started at: %s\n" +
                 "========================",
                 delivery.getId(),
                 delivery.getOrderId(),
-                DELIVERY_TIME_THRESHOLD_MINUTES,
+                minutesExceeded,
                 delivery.getDeliveryMan().getName(),
+                delivery.getDeliveryMan().getId(),
                 delivery.getCustomer().getName(),
+                delivery.getCustomer().getId(),
                 LocalDateTime.ofInstant(delivery.getStartTime(), ZoneId.systemDefault()).format(formatter)
             );
             
-            LOG.warn(message);
+            log.warn(message);
         } catch (Exception e) {
-            LOG.error("Error notifying customer support for delivery {}: {}", 
+            log.error("Error notifying customer support for delivery {}: {}", 
                      delivery.getId(), e.getMessage(), e);
         }
     }

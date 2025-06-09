@@ -28,6 +28,7 @@ public class Delivery implements Serializable{
   String orderId;
 
   @Column(name = "start_time")
+  @NotNull
   Instant startTime;
 
   @Column(name = "end_time")
@@ -44,6 +45,7 @@ public class Delivery implements Serializable{
   Long commission;
 
   @ManyToOne
+  @NotNull
   @JoinColumn(name = "delivery_man_id", referencedColumnName = "id")
   Person deliveryMan;
 
