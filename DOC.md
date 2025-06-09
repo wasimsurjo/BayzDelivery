@@ -10,11 +10,13 @@
 
 1. **Starting the Database**
    ```bash
-   docker compose up
+   docker compose up -d
    ```
    This will start PostgreSQL on port 5432.
 
 2. **Running the Application**
+
+# Local Run
    ```bash
    # For Linux/Mac
    ./gradlew bootRun
@@ -22,7 +24,20 @@
    # For Windows
    gradlew.bat bootRun
    ```
-   The application will start on port 8081 with context path `/api`.
+   The application will start on port 8081 :`http://localhost:8081/api`. (Locally)
+
+# Docker Deployment 
+    ```bash
+    docker build -t bayzdelivery:latest .
+    ```
+    
+    ```bash
+    docker run --name bayzdelivery-app --network bayzdelivery_postgres -p 8081:8081 \
+    -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bayzdelivery \
+    -e SPRING_DATASOURCE_USERNAME=db_user \
+    -e SPRING_DATASOURCE_PASSWORD=123qwe \
+    bayzdelivery:latest
+    ```
 
 ## API Endpoint Testing
 
